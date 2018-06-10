@@ -37,6 +37,8 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 	
 	public Cadastro(CountDownLatch CDL) {
 		
+		config = this;
+		
 		this.setLayout(null);
 		this.setSize(Settings.widthResolution, Settings.heightResolution);
 		System.out.println(this.getWidth() + " " + this.getHeight());
@@ -79,8 +81,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		SGBDform.setQuestions(questions, Constants.CENTER, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143)}, 1f);
 		SGBDform.setBackOptions(80,24, new Color[] {new Color(241,241,241), new Color(241,241,241), new Color(216,242,255)}, 1f,new int[] {Settings.convertHeight(2),Settings.convertHeight(2),Settings.convertHeight(2)}, new Color[] {new Color(185,185,185), new Color(185,185,185), new Color(84,150,209)});
 		SGBDform.setOptions(options, Constants.LEFT_TO_RIGHT, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143),new Color(143,143,143),new Color(42,42,42)}, 1f);
-		//SGBDform.setValidator(0,Question1);
-		SGBDform.next(2);
+		SGBDform.setValidator(0,Question1);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
