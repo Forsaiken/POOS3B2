@@ -1,3 +1,4 @@
+package objects;
 
 public class Disciplina {
 
@@ -7,6 +8,7 @@ public class Disciplina {
 	private float[] provas;
 
 	public Disciplina(byte codigo, String nome) {
+		
 		this.nome = nome;
 		this.codigo = codigo;
 		trabalhos = new float[2];

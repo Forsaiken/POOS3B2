@@ -1,6 +1,9 @@
+package objects;
 import java.util.ArrayList;
 
-public class Aluno extends Pessoa implements Materias{ /// TESTE LINCOLN 
+import global.Materias;
+
+public class Aluno extends Pessoa implements Materias {
 
 	private ArrayList<Disciplina> Disciplinas;
 	
@@ -8,9 +11,10 @@ public class Aluno extends Pessoa implements Materias{ /// TESTE LINCOLN
 		
 		this.setNome(nome);
 		this.setRA(RA);
-		Disciplinas = new ArrayList<Disciplina>();
 		this.setUnidade(unidade);
 		unidade.setAluno(this);
+		
+		Disciplinas = new ArrayList<Disciplina>();
 		
 	}
 	
