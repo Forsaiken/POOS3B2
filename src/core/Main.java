@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.SwingUtilities;
 
 import global.Settings;
+import objects.Unidade;
 import panels.Cadastro;
 
 public class Main {
@@ -20,6 +21,7 @@ public class Main {
 	private static boolean loadSettings = false;
 	private static Cadastro cadastro;
 	private static CountDownLatch stopSignal;
+	private static Unidade anhanguera;
 
 	public static void main(String[] args) {
 		
@@ -99,12 +101,11 @@ public class Main {
 	SwingUtilities.invokeLater(Cadastro);
 	
 	}
-
+	
 	private static Runnable Frame = new Runnable() {
 		public void run() {
 		window = new Display();
 		Settings.window = window;
-		window.getContentPane().setBackground(Color.WHITE);
 		
 		Settings.WIDTH = window.getContentPane().getSize().width;
 		Settings.HEIGHT = window.getContentPane().getSize().height;
@@ -118,9 +119,11 @@ public class Main {
 		}
 	};
 	
+	
 	private static Runnable Cadastro = new Runnable() {
 		public void run() {
-			cadastro = new Cadastro(stopSignal);
+			anhanguera = new Unidade();
+			cadastro = new Cadastro(stopSignal, anhanguera);
 			cadastro.setVisible(true);
 			Settings.window.getContentPane().add(cadastro);
 		}

@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -16,6 +17,9 @@ import core.FormUI;
 import core.Sprite;
 import global.Constants;
 import global.Settings;
+import objects.Aluno;
+import objects.Professor;
+import objects.Unidade;
 
 @SuppressWarnings("serial")
 public class Cadastro extends JPanel implements ActionListener, KeyListener, Constants {
@@ -23,32 +27,40 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 	CountDownLatch CDL;
 	Timer t;
 	Sprite rect;
+	private static Unidade unidade;
 	int phase;
-	private static Cadastro config;
 	
 	// Formulario
 	
-	private FormUI SGBDform;
-	String[] questions = new String[] {"Escolha uma das opções abaixo:","Cadastro de Professor:","Cadastro de Aluno:"};
-	String[][] options= new String[][] {{"Adicionar Professor", "Adicionar Aluno"},{"%BOX%Nome do Professor","%BOX%RA", "%BOX%CPF"},{"%BOX%Nome do Aluno","%BOX%RA", "%BOX%CPF"}};
+	private static FormUI ADDform;
+	String[] questions = new String[] {
+			"%ONE%%NEED%Escolha uma das opções abaixo:",
+			"Cadastro de Professor:",
+			"Cadastro de Aluno:",
+			"%MULTI%%NEED%Vincule as matérias:"};
+	
+	String[][] options= new String[][] {
+		{"Adicionar Professor", "Adicionar Aluno"},
+		{"%BOX%%NEED%Nome do Professor","%BOX%%NEED%RA", "%BOX%CPF"},
+		{"%BOX%%NEED%Nome do Aluno","%BOX%%NEED%RA", "%BOX%CPF"},
+		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"}};
 	
 	
 	Sprite configSGBD, configSGBD2;
 	
-	public Cadastro(CountDownLatch CDL) {
-		
-		config = this;
+	public Cadastro(CountDownLatch CDL, Unidade unidade) {
 		
 		this.setLayout(null);
 		this.setSize(Settings.widthResolution, Settings.heightResolution);
 		System.out.println(this.getWidth() + " " + this.getHeight());
 		
 		this.CDL = CDL;
+		this.unidade = unidade;
 		
 		this.setBackground(Color.WHITE);
 		
 		configSGBD = new Sprite();
-		configSGBD.setString("CONFIGURAÇÃO DE BANCO DE DADOS", new Font("Khand Medium", Font.TRUETYPE_FONT, Settings.convertFont(48)), new Color[] {new Color(35,35,35)}, 1f);
+		configSGBD.setString("SISTEMA DE NOTAS", new Font("Calibri", Font.TRUETYPE_FONT, Settings.convertFont(48)), new Color[] {new Color(35,35,35)}, 1f);
 		configSGBD.setFormatString(CENTER);
 		configSGBD.setLocation(this.getWidth()/2, this.getHeight()/2 - Settings.convertPositionY(250));
 		
@@ -62,8 +74,8 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		configSGBD.setAnimation(true);
 		
 		configSGBD2 = new Sprite();
-		configSGBD2.setString("Não foi detectado um banco de dados configurado.\nO assistente realizará uma nova configuração",
-				new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143)}, 1f);
+		configSGBD2.setString("Sistemas de Informação - 3° Semestre",
+				new Font("Calibri Light", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143)}, 1f);
 		configSGBD2.setFormatString(CENTER);
 		configSGBD2.setLocation(this.getWidth()/2,this.getHeight()/2 + Settings.convertPositionY(240));
 		
@@ -77,20 +89,134 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		configSGBD2.setAnimation(true);
 		
 	
-		SGBDform = new FormUI(this,this.getWidth()/2 - Settings.convertWidth(675)/2, this.getHeight()/2 - Settings.convertPositionY(100), 675);
-		SGBDform.setQuestions(questions, Constants.CENTER, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143)}, 1f);
-		SGBDform.setBackOptions(80,24, new Color[] {new Color(241,241,241), new Color(241,241,241), new Color(216,242,255)}, 1f,new int[] {Settings.convertHeight(2),Settings.convertHeight(2),Settings.convertHeight(2)}, new Color[] {new Color(185,185,185), new Color(185,185,185), new Color(84,150,209)});
-		SGBDform.setOptions(options, Constants.LEFT_TO_RIGHT, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143),new Color(143,143,143),new Color(42,42,42)}, 1f);
-		SGBDform.setValidator(0,Question1);
+		ADDform = new FormUI(this,this.getWidth()/2 - Settings.convertWidth(675)/2, this.getHeight()/2 - Settings.convertPositionY(100), 675);
+		ADDform.setQuestions(questions, Constants.CENTER, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143)}, 1f);
+		ADDform.setBackOptions(80,24, new Color[] {new Color(241,241,241), new Color(241,241,241), new Color(216,242,255)}, 1f,new int[] {Settings.convertHeight(2),Settings.convertHeight(2),Settings.convertHeight(2)}, new Color[] {new Color(185,185,185), new Color(185,185,185), new Color(84,150,209)});
+		ADDform.setOptions(options, Constants.LEFT_TO_RIGHT, new Font("Calibre", Font.TRUETYPE_FONT, Settings.convertFont(25)), new Color[] {new Color(143,143,143),new Color(143,143,143),new Color(42,42,42)}, 1f);
+		ADDform.setValidator(0,Question0);
+		ADDform.setValidator(1,Question1);
+		ADDform.setValidator(2,Question2);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
 	}
 	
+	public static Runnable Question0 = new Runnable() {
+		public void run() {
+			String answer = ADDform.getAnswer(0);
+			if (answer.equals("Adicionar Aluno")) {
+				ADDform.next(2);
+			} else if (answer.equals("Adicionar Professor")) {
+				ADDform.next(1);
+			}
+		}
+	};
+	
 	public static Runnable Question1 = new Runnable() {
 		public void run() {
-			String answer = config.SGBDform.getAnswer(0);
-			config.SGBDform.next(2);
+			String answer1 = ADDform.getAnswer(1, 0);
+			String answer2 = ADDform.getAnswer(1, 1);
+			String answer3 = ADDform.getAnswer(1, 2);
+			
+			boolean erro = false;
+			
+			if (answer1.matches(".*\\d+.*")) {
+				JOptionPane.showMessageDialog(null,"Nome não pode possuir número.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 3) {
+				JOptionPane.showMessageDialog(null,"Nome requer mais que 3 caracteres.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer3.matches("[0-9]+") && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer3.replaceAll("\\s+", "").length() != 11  && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (erro != true) {
+				
+				long RA = Long.parseLong(answer2);
+				
+				Professor professor = new Professor(answer1, RA);
+				if (!answer3.equals("")) {
+					long CPF = Long.parseLong(answer3);
+					professor.setCPF(CPF);
+				}
+				
+				unidade.setProfessor(professor);
+				
+				System.out.println("O professor " + unidade.getProfessor(RA).getNome() + " foi adicionado com sucesso!");
+				
+				ADDform.next(3);
+		
+			}
+			
+			
+		}
+	};
+	
+	public static Runnable Question2 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(2, 0);
+			String answer2 = ADDform.getAnswer(2, 1);
+			String answer3 = ADDform.getAnswer(2, 2);
+			
+			boolean erro = false;
+			
+			if (answer1.matches(".*\\d+.*")) {
+				JOptionPane.showMessageDialog(null,"Nome não pode possuir número.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 3) {
+				JOptionPane.showMessageDialog(null,"Nome requer mais que 3 caracteres.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer3.matches("[0-9]+") && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer3.replaceAll("\\s+", "").length() != 11  && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (erro != true) {
+				
+				long RA = Long.parseLong(answer2);
+				
+				Aluno aluno = new Aluno(answer1, RA);
+				if (!answer3.equals("")) {
+					long CPF = Long.parseLong(answer3);
+					aluno.setCPF(CPF);
+				}
+				
+				
+				unidade.setAluno(aluno);
+				
+				System.out.println("O aluno " + unidade.getAluno(RA).getNome() + " foi adicionado com sucesso!");
+			
+				ADDform.next(3);
+		
+			}
+			
 		}
 	};
 	
@@ -100,7 +226,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		
 		configSGBD.draw(g);
 		configSGBD2.draw(g);
-		SGBDform.draw(g);
+		ADDform.draw(g);
 	}
 
 	@Override
@@ -144,7 +270,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		}
 		
 		if (phase == 1 && configSGBD.getAnimation() == false) {
-			SGBDform.open();
+			ADDform.open();
 			phase++;
 		}
 		

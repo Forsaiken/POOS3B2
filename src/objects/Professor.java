@@ -5,11 +5,9 @@ public class Professor extends Pessoa{
 	private byte materia;
 	private Unidade unidade;
 	
-	public Professor(String nome, long RA, Unidade unidade) {
+	public Professor(String nome, long RA) {
 		this.setNome(nome);
 		this.setRA(RA);
-		this.setUnidade(unidade);
-		unidade.setProfessor(this);	
 		
 	}
 	

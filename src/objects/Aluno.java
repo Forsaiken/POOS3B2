@@ -7,12 +7,11 @@ public class Aluno extends Pessoa implements Materias {
 
 	private ArrayList<Disciplina> Disciplinas;
 	
-	public Aluno(String nome, long RA, Unidade unidade) {
+	public Aluno(String nome, long RA) {
 		
 		this.setNome(nome);
 		this.setRA(RA);
 		this.setUnidade(unidade);
-		unidade.setAluno(this);
 		
 		Disciplinas = new ArrayList<Disciplina>();
 		

@@ -2,6 +2,8 @@ package core;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,6 +20,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.GrayFilter;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import global.Constants;
 import global.Settings;
@@ -30,6 +33,7 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	// VARIABLES - BASIC PROPERTIES
 	
 	private int mode = 0;
+	private int tabIndex;
 	private int[] width  =  {0,0,0};
 	private int[] height =  {0,0,0};
 	private int[] posX 	 =  {0,0,0};
@@ -44,10 +48,10 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	
 	// VARIABLES - SHAPES
 	
-	Polygon poly;
-	int[] polyX;
-	int[] polyY;
-	int polyPoints;
+	private Polygon poly;
+	private int[] polyX;
+	private int[] polyY;
+	private int polyPoints;
 	
 	// VARIABLES - STRING
 	
@@ -59,6 +63,7 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	private boolean spacedFont;
 	private double fontSpacement;
 	private int stringSpacement = Settings.convertPositionY(8);
+	private float fontAlpha;
 	
 	// VARIABLES - IMAGE
 	
@@ -67,6 +72,14 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	private byte shape;
 	private FontMetrics metrics;
 	private Graphics2D g2d;
+	
+	// VARIABLES - TEXT FIELD
+	
+	private JPanel panel;
+	private JTextField textBox;
+	
+	private String sample;
+	private Color sampleColor;
 	
 	// VARIABLES - COLORS
 	
@@ -141,6 +154,10 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 			
 			if (this.radialGradient != null) {
 				this.radialGradient = new RadialGradientPaint(this.posX[1] + this.width[1]/2,this.posY[1] + this.height[1]/2, gradientRadius, gradientDistance, gradientColors, CycleMethod.NO_CYCLE);
+			}
+			
+			if (textBox != null) {
+				textBox.setBounds(this.posX[1] + Settings.convertPositionX(20), this.posY[1], this.width[1] - Settings.convertWidth(40), this.height[1]);
 			}
 		}
 		
@@ -224,6 +241,10 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 				}
 			}
 		}
+		
+		if (textBox != null) {
+			textBox.repaint();
+		}
 	}
 	
 	// SETS - PROPERTIES
@@ -232,6 +253,9 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		this.mode = mode;
 	}
 	
+	public void setTab(int index) {
+		tabIndex = index;
+	}
 	// SETS - GEOMETRIC SHAPES
 	
 	public void setFillRect(int width, int height, Color[] color){
@@ -339,8 +363,8 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		this.alpha[1] = alpha;
 	}
 	
-	public void setStringName(String[] string){
-		this.string = string;
+	public void setStringName(String string){
+		this.string = string.split("\n");
 	}
 
 	public void setSpacementString(double spacement){
@@ -359,6 +383,50 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	public void setFormatString(byte formatText) {
 		this.textFormat = formatText;
 	}
+	
+	// SETS - TEXT FIELD
+	
+	public void setTextBox(String sample, Font font, Color sampleColor, Color typeColor) {
+		
+		this.font = font;
+		this.sample = sample;
+		this.fontColor = new Color[] {sampleColor};
+		
+		textBox = new JTextField("");
+		textBox.setOpaque(false);
+		textBox.setBorder(null);
+		textBox.setBounds(this.posX[1] + Settings.convertPositionX(20), this.posY[1], this.width[1] - Settings.convertWidth(40), this.height[1]);
+		textBox.setForeground(typeColor);
+		textBox.setFont(font);
+	}
+	
+	public void setTextBox(Color typeColor) {
+		textBox = new JTextField("");
+		this.sample = string[0];
+		textBox.setOpaque(false);
+		textBox.setBorder(null);
+		textBox.setBounds(this.posX[1] + Settings.convertPositionX(20), this.posY[1], this.width[1] - Settings.convertWidth(40), this.height[1]);
+		textBox.setForeground(typeColor);
+		textBox.setFont(font);
+		
+		if (this.textFormat == Constants.CENTER)
+			textBox.setHorizontalAlignment(JTextField.CENTER);
+		else if (this.textFormat == Constants.LEFT_TO_RIGHT)
+			textBox.setHorizontalAlignment(JTextField.LEFT);
+	}
+	
+	public void add(JPanel panel) {
+		panel.add(textBox);
+	}
+	
+	public void remove(JPanel panel) {
+		panel.remove(textBox);
+	}
+
+	public void setSample() {
+		this.string[0] = sample;
+	}
+	
 	
 	// SETS - LOCATION
 
@@ -400,6 +468,7 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		this.posX[2] = auxX;
 		this.posY[2] = auxY;
 	}
+	
 	// SETS - POSITION X
 	
 	public void setInitialPosX(int x) {
@@ -550,6 +619,7 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		this.alpha[0] = this.alpha[2];
 		this.alpha[2] = aux;
 	}
+	
 	// SETS - ANIMATION
 	
 	public void setBlendMode(BlendComposite blend) {
@@ -625,6 +695,9 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		return mode;
 	}
 	
+	public int getTab() {
+		return tabIndex;
+	}
 	// GETS - STRING
 	
 	public String[] getString() {
@@ -739,10 +812,14 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 		return scaledImage;
 	}
 
+	// GETS - TEXTBOX
+	
+	public JTextField getTextBox() {
+		return this.textBox;
+	}
 	
 	// MOUSE - ACTIONS
-	
-	public void setMouseListener(Display window) {
+		public void setMouseListener(Display window) {
 		window.addMouseListener(this);
 		window.addMouseMotionListener(this);
 		
@@ -750,15 +827,6 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-		if (e.getX() > this.posX[1] && e.getY() > this.posY[1] + Settings.TWH && e.getX() < this.width[1] + this.posX[1] && e.getY() < this.height[1] + this.posY[1] + Settings.TWH) {
-			if (mode != 2) {
-				this.mode = 2;
-			} else if (this.mode == 2) {
-				this.mode = 0;
-			}
-			
-		}
 		
 	}
 
