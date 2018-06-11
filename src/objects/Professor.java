@@ -2,12 +2,14 @@ package objects;
 import java.util.ArrayList;
 
 public class Professor extends Pessoa{
-	private byte materia;
+	
+	private ArrayList<Byte> materias;
 	private Unidade unidade;
 	
 	public Professor(String nome, long RA) {
 		this.setNome(nome);
 		this.setRA(RA);
+		materias = new ArrayList<Byte>();
 		
 	}
 	
@@ -21,6 +23,20 @@ public class Professor extends Pessoa{
 			}
 		}
 		return alunos.get(index);
+	}
+	
+	public void setDisciplina(byte materia) {
+		
+		boolean exists = false;
+		
+		for (int i = 0; i < materias.size(); i++) {
+			if (materias.get(i).equals(materia))
+				exists = true;
+		}
+		
+		if (exists == false)
+			materias.add(materia);
+			
 	}
 }
 

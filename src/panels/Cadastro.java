@@ -16,18 +16,21 @@ import javax.swing.Timer;
 import core.FormUI;
 import core.Sprite;
 import global.Constants;
+import global.Materias;
 import global.Settings;
 import objects.Aluno;
 import objects.Professor;
 import objects.Unidade;
 
 @SuppressWarnings("serial")
-public class Cadastro extends JPanel implements ActionListener, KeyListener, Constants {
+public class Cadastro extends JPanel implements ActionListener, KeyListener, Constants, Materias {
 	
 	CountDownLatch CDL;
 	Timer t;
 	Sprite rect;
 	private static Unidade unidade;
+	private static Professor lastProfessor;
+	private static Aluno lastAluno;
 	int phase;
 	
 	// Formulario
@@ -96,6 +99,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		ADDform.setValidator(0,Question0);
 		ADDform.setValidator(1,Question1);
 		ADDform.setValidator(2,Question2);
+		ADDform.setValidator(3,Question3);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
@@ -158,6 +162,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				
 				System.out.println("O professor " + unidade.getProfessor(RA).getNome() + " foi adicionado com sucesso!");
 				
+				lastProfessor = professor;
 				ADDform.next(3);
 		
 			}
@@ -212,11 +217,49 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				unidade.setAluno(aluno);
 				
 				System.out.println("O aluno " + unidade.getAluno(RA).getNome() + " foi adicionado com sucesso!");
-			
+				
+				lastAluno = aluno;
 				ADDform.next(3);
 		
 			}
 			
+		}
+	};
+	
+	public static Runnable Question3 = new Runnable() {
+		public void run() {
+			
+			String[] answer = ADDform.getAnswers(3);
+			
+			for (int i = 0; i < answer.length;i++) {
+				if (ADDform.getPreviousQuestion() == 1) {
+					switch (answer[i]) {
+					case "Economia":
+						lastProfessor.setDisciplina(ECONOMIA);
+					case "Engenharia de Software":
+						lastProfessor.setDisciplina(ENGENHARIA_SOFTWARE);
+					case "Programação Orientada a Objetos":
+						lastProfessor.setDisciplina(POO1);
+					case "Sistemas de Computação":
+						lastProfessor.setDisciplina(SISTEMAS_COMPUTACAO);
+					}
+				}
+				
+				if (ADDform.getPreviousQuestion() == 2) {
+					switch (answer[i]) {
+					case "Economia":
+						lastAluno.setDisciplina(ECONOMIA,"Economia");
+					case "Engenharia de Software":
+						lastAluno.setDisciplina(ENGENHARIA_SOFTWARE,"Engenharia de Software");
+					case "Programação Orientada a Objetos":
+						lastAluno.setDisciplina(POO1, "Programação Orientada a Objetos");
+					case "Sistemas de Computação":
+						lastAluno.setDisciplina(SISTEMAS_COMPUTACAO, "Sistemas de Computação");
+					}
+				}
+			}
+				
+			System.out.println(lastProfessor.getNome() + " disciplinas vinculadas com sucesso.");
 		}
 	};
 	

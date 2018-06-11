@@ -441,6 +441,10 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			return answers.get(question).get(0);
 	}
 	
+	public String[] getAnswers(int question) {
+		return this.answers.get(question).toArray(new String[answers.get(question).size()]);
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 }
@@ -492,10 +496,12 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		return string;
 		
 	}
+	
+	public int getPreviousQuestion() {
+		return this.previousQuestion;
+	}
 
 	@Override
-	
-
 	public void mousePressed(MouseEvent e) {
 		
 		int count = 0;
