@@ -3,22 +3,22 @@ package objects;
 public class Disciplina {
 
 	private byte codigo;
-	private float[] trabalhos;
-	private float[] provas;
+	private double[] trabalhos;
+	private double[] provas;
 
 	public Disciplina(byte codigo) {
 		
 		this.codigo = codigo;
-		trabalhos = new float[2];
-		provas = new float[2];
+		trabalhos = new double[2];
+		provas = new double[2];
 
 	}
 
-	public void setNotaProva(int bimestre, float nota) {
+	public void setNotaProva(int bimestre, double nota) {
 
-		if (bimestre <= 2 && nota <= 7) {
+		if (bimestre <= 2 && bimestre > 0 && nota >= 0 && nota <= 7) {
 
-			this.trabalhos[bimestre - 1] = nota;
+			this.provas[bimestre - 1] = nota;
 
 		} else {
 			System.out.println("Valor de Bimestre ou nota de prova incorreto!");
@@ -26,9 +26,9 @@ public class Disciplina {
 
 	}
 
-	public void setNotaTrabalho(int bimestre, float nota) {
+	public void setNotaTrabalho(int bimestre, double nota) {
 
-		if (bimestre <= 2 && nota <= 3) {
+		if (bimestre <= 2 && bimestre > 0 && nota >= 0 && nota <= 3) {
 
 			this.trabalhos[bimestre - 1] = nota;
 
@@ -38,9 +38,9 @@ public class Disciplina {
 
 	}
 
-	public float getNotaB1() {
+	public double getNotaB1() {
 
-		float notaB1 = 0;
+		double notaB1 = 0;
 
 		for (int i = 0; i < 1; i++) {
 			notaB1 += (this.trabalhos[i] + this.provas[i]);
@@ -49,9 +49,9 @@ public class Disciplina {
 		return notaB1;
 	}
 
-	public float getNotaB2() {
+	public double getNotaB2() {
 
-		float notaB2 = 0;
+		double notaB2 = 0;
 
 		for (int i = 1; i < 2; i++) {
 			notaB2 += (this.trabalhos[i] + this.provas[i]);
@@ -60,15 +60,15 @@ public class Disciplina {
 		return notaB2;
 	}
 
-	public float getNotaTotal() {
+	public double getNotaTotal() {
 
-		float notaB1 = 0;
+		double notaB1 = 0;
 
 		for (int i = 0; i < 1; i++) {
 			notaB1 += (this.trabalhos[i] + this.provas[i]) * 0.4f;
 		}
 
-		float notaB2 = 0;
+		double notaB2 = 0;
 
 		for (int i = 1; i < 2; i++) {
 			notaB2 += (this.trabalhos[i] + this.provas[i]) * 0.6f;

@@ -31,6 +31,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 	private static Unidade unidade;
 	private static Professor lastProfessor;
 	private static Aluno lastAluno;
+	private static byte lastDisciplina;
 	int phase;
 	
 	// Formulario
@@ -45,7 +46,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			"%ONE%Preencha uma das lacunas para remover o Aluno:",
 			"%ONE%Preencha uma das lacunas para remover o Professor:",
 			"%MULTI%%NEED%Vincule as matérias:",
-			"%ONE%Selecione a qual matéria deseja vincular a nota:",
+			"%ONE%Escolha a matéria que deseja vincular nota:",
 			"Preencha os campos para vincular a nota:"};
 	
 	String[][] options= new String[][] {
@@ -58,7 +59,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%CPF do Professor"},
 		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},		
 		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},
-		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%RA do Aluno", "%BOX%%NEED%Bimestre", "Nota de Trabalho", "Nota de Prova"}};
+		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%RA do Aluno", "%BOX%%NEED%Bimestre", "%BOX%%NEED%Nota de Trabalho", "%BOX%%NEED%Nota de Prova"}};
 	
 	
 	Sprite configSGBD, configSGBD2;
@@ -116,6 +117,8 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		ADDform.setValidator(5,Question5);
 		ADDform.setValidator(6,Question6);
 		ADDform.setValidator(7,Question7);
+		ADDform.setValidator(8,Question8);
+		ADDform.setValidator(9,Question9);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
@@ -252,7 +255,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				
 				long RA = Long.parseLong(answer2);
 				
-				Professor professor = new Professor(answer1, RA);
+				Professor professor = new Professor(answer1, RA, unidade);
 				if (!answer3.equals("")) {
 					long CPF = Long.parseLong(answer3);
 					professor.setCPF(CPF);
@@ -326,10 +329,10 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			boolean erro = false;
 			
 			if (!answer1.matches("[0-9]+")) {
-				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,"ID somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else if (answer1.replaceAll("\\s+", "").length() < 4) {
-				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,"ID requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			}
 			
@@ -372,34 +375,143 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			String[] answer = ADDform.getAnswers(7);
 			
 			for (int i = 0; i < answer.length;i++) {
-				if (ADDform.getPreviousQuestion() == 1) {
+				
+				if (ADDform.getPreviousQuestion() == 4) {
 					switch (answer[i]) {
 					case "Economia":
-						lastProfessor.setDisciplina(ECONOMIA);
-					case "Engenharia de Software":
-						lastProfessor.setDisciplina(ENGENHARIA_SOFTWARE);
+						lastProfessor.setDisciplina(ECONOMIA); break;
+					case "Engenharia de Software": 
+						lastProfessor.setDisciplina(ENGENHARIA_SOFTWARE); break;
 					case "Programação Orientada a Objetos":
-						lastProfessor.setDisciplina(POO1);
+						lastProfessor.setDisciplina(POO1); break;
 					case "Sistemas de Computação":
-						lastProfessor.setDisciplina(SISTEMAS_COMPUTACAO);
+						lastProfessor.setDisciplina(SISTEMAS_COMPUTACAO); break;
 					}
 				}
 				
-				if (ADDform.getPreviousQuestion() == 2) {
+				if (ADDform.getPreviousQuestion() == 3) {
 					switch (answer[i]) {
 					case "Economia":
-						lastAluno.setDisciplina(ECONOMIA);
+						lastAluno.setDisciplina(ECONOMIA); break;
 					case "Engenharia de Software":
-						lastAluno.setDisciplina(ENGENHARIA_SOFTWARE);
+						lastAluno.setDisciplina(ENGENHARIA_SOFTWARE); break;
 					case "Programação Orientada a Objetos":
-						lastAluno.setDisciplina(POO1);
+						lastAluno.setDisciplina(POO1); break;
 					case "Sistemas de Computação":
-						lastAluno.setDisciplina(SISTEMAS_COMPUTACAO);
+						lastAluno.setDisciplina(SISTEMAS_COMPUTACAO); break;
 					}
 				}
 			}
 			
 			ADDform.next(0);
+		}
+	};
+	
+	public static Runnable Question8 = new Runnable() {
+		public void run() {
+			
+			String answer = ADDform.getAnswer(8);
+			
+					switch (answer) {
+					case "Economia":
+						lastDisciplina = ECONOMIA; break;
+					case "Engenharia de Software":
+						lastDisciplina = (ENGENHARIA_SOFTWARE); break;
+					case "Programação Orientada a Objetos":
+						lastDisciplina = (POO1); break;
+					case "Sistemas de Computação":
+						lastDisciplina = (SISTEMAS_COMPUTACAO); break;
+					}
+			
+			ADDform.next(9);
+		}
+	};
+	
+	public static Runnable Question9 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(9, 0).replaceAll("\\s+", "");
+			String answer2 = ADDform.getAnswer(9, 1).replaceAll("\\s+", "");
+			String answer3 = ADDform.getAnswer(9, 2).replaceAll("\\s+", "");
+			String answer4 = ADDform.getAnswer(9, 3).replaceAll("\\s+", "");
+			String answer5 = ADDform.getAnswer(9, 4).replaceAll("\\s+", "");
+			
+			boolean erro = false;
+			
+			if (!answer1.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"ID deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"ID requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer3.matches("[0-9]+") && answer3.length() != 1) {
+				JOptionPane.showMessageDialog(null,"Bimestre deve conter somente o número 1 ou 2.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else {
+				if (Integer.parseInt(answer3) < 0 || Integer.parseInt(answer3) > 2) {
+					JOptionPane.showMessageDialog(null,"Bimestre deve conter somente o número 1 ou 2.","Erro", JOptionPane.ERROR_MESSAGE);
+					erro = true;
+				}
+			}
+			
+			if (!answer4.matches("[0-9]+") && answer4.length() != 1) {
+				JOptionPane.showMessageDialog(null,"Nota de Trabalho somente deve conter valor entre 0 e 3","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else {
+				if (Double.parseDouble(answer4) < 0 || Double.parseDouble(answer4) > 3) {
+					JOptionPane.showMessageDialog(null,"Nota de Trabalho somente deve conter valor entre 0 e 3","Erro", JOptionPane.ERROR_MESSAGE);
+					erro = true;
+				}
+			}
+			
+			if (!answer5.matches("[0-9]+") && answer5.length() != 1) {
+				JOptionPane.showMessageDialog(null,"Nota de Prova somente deve conter valor entre 0 e 7","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else {
+				if (Double.parseDouble(answer5) < 0 || Double.parseDouble(answer5) > 7) {
+					JOptionPane.showMessageDialog(null,"Nota de Prova somente deve conter valor entre 0 e 7","Erro", JOptionPane.ERROR_MESSAGE);
+					erro = true;
+				}
+			}
+			
+			if (erro != true) {
+				
+				long ID = Long.parseLong(answer1);
+				long RA = Long.parseLong(answer2);
+				int bimestre = Integer.parseInt(answer3);
+				double trabalho = Double.parseDouble(answer4);
+				double prova = Double.parseDouble(answer5);
+				
+				Professor prof = unidade.getProfessor(ID);
+				
+				if (prof != null) {
+					
+					Aluno aluno = prof.getAluno(RA);
+					
+					if (aluno != null) {
+						
+						aluno.getDisciplina(lastDisciplina).setNotaTrabalho(bimestre, trabalho);
+						aluno.getDisciplina(lastDisciplina).setNotaProva(bimestre, prova);
+						JOptionPane.showMessageDialog(null,"As notas de " + aluno.getNome() + " foram vinculadas com sucesso!","Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+						
+					} else
+						JOptionPane.showMessageDialog(null,"Aluno não encontrado entre as disciplinas do Professor!","Erro", JOptionPane.ERROR_MESSAGE);
+					
+				} else
+					JOptionPane.showMessageDialog(null,"Professor não encontrado!","Erro", JOptionPane.ERROR_MESSAGE);
+				
+		
+			}
+			
 		}
 	};
 	

@@ -29,20 +29,22 @@ public class Aluno extends Pessoa implements Materias {
 			}
 		}
 		
-		disciplinas.add(disciplina);
+		if (exists != true) {
+			disciplinas.add(disciplina);
+			System.out.println(disciplina.getCodigo() + "foi adicionada. Total: " + disciplinas.size());
+		}
 		
 	}
 	
 
 	public Disciplina getDisciplina(byte codigo) {
-		int index = 666;
+
 		for (int i = 0; i < disciplinas.size(); i++) {
 			if (disciplinas.get(i).getCodigo() == codigo) {
-				index = i;
-				break;
+				return disciplinas.get(i);
 			}
 		}
-		return disciplinas.get(index);
+		return null;
 	}
 	
 }
