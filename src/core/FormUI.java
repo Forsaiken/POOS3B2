@@ -44,6 +44,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 	
 	private int question;
 	private int previousQuestion;
+	private int oldQuestion;
 	private int nextQuestion;
 	
 	private Font questionFont;
@@ -107,16 +108,18 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		}
 		
 		if (next) {
-			questions.get(nextQuestion).setInitialLocation(Settings.WIDTH + questions.get(nextQuestion).getStringWidth(g), questions.get(nextQuestion).getPosY());
+			questions.get(nextQuestion).setFinalPosX(this.posX + this.width/2);
+			questions.get(nextQuestion).setInitialLocation(Settings.WIDTH + questions.get(nextQuestion).getStringWidth(g)/2 + this.width/2, questions.get(nextQuestion).getPosY());
 			questions.get(nextQuestion).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(nextQuestion).setAnimation(true);
 			
 			questions.get(question).reverseLocation();
-			questions.get(question).setFinalPosX(0 - questions.get(question).getStringWidth(g));
+			questions.get(question).setFinalPosX(0 - questions.get(question).getStringWidth(g)/2 - this.width/2);
 			questions.get(question).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(question).setAnimation(true);
 			
 			this.passage.add(nextQuestion);
+			this.oldQuestion = question;
 			this.previousQuestion = question;
 			this.question = nextQuestion;
 			next = false;
@@ -124,6 +127,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			if (question != 0) {
 				openBack();
 				resetOptions();
+				resetTextBox();
 				backEnabled = true;
 			} else {
 				
@@ -142,17 +146,20 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		}
 		
 		if (back) {
-			questions.get(nextQuestion).setInitialLocation(0 - questions.get(nextQuestion).getStringWidth(g), questions.get(nextQuestion).getPosY());
+			questions.get(nextQuestion).setFinalPosX(this.posX + this.width/2);
+			questions.get(nextQuestion).setInitialLocation(0 - questions.get(nextQuestion).getStringWidth(g)/2 - this.width/2, questions.get(nextQuestion).getPosY());
 			questions.get(nextQuestion).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(nextQuestion).setAnimation(true);
 			
 			questions.get(question).reverseLocation();
-			questions.get(question).setFinalPosX(Settings.WIDTH + questions.get(question).getStringWidth(g));
+			questions.get(question).setFinalPosX(Settings.WIDTH + questions.get(question).getStringWidth(g)/2 + this.width/2);
 			questions.get(question).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(question).setAnimation(true);
 			
 			this.passage.remove(passage.size() - 1);
+			this.oldQuestion = question;
 			this.question = nextQuestion;
+			
 			back = false;
 			
 			if (passage.size() - 2 >= 0)
@@ -174,14 +181,14 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		backArrow.draw(g);
 		nextArrow.draw(g);
 		
-		if(questions.get(previousQuestion).getAnimation())
-			questions.get(previousQuestion).draw(g);
+		if(questions.get(oldQuestion).getAnimation())
+			questions.get(oldQuestion).draw(g);
 		
 		questions.get(this.question).draw(g);
 		
-		if (options.get(previousQuestion).get(0).getAnimation()) {
-			for (int i = 0; i < options.get(previousQuestion).size(); i++) {
-				options.get(previousQuestion).get(i).draw(g);
+		if (options.get(oldQuestion).get(0).getAnimation()) {
+			for (int i = 0; i < options.get(oldQuestion).size(); i++) {
+				options.get(oldQuestion).get(i).draw(g);
 			}
 		}
 
@@ -290,6 +297,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		back = true;		
 		
 	}
+	
 	public void setQuestions(String[] questions, byte textFormat, Font font, Color[] color, float alpha) {
 		
 		this.questionStrings = questions;
