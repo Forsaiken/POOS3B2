@@ -1,6 +1,8 @@
 package objects;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 public class Unidade {
 	
 	private ArrayList<Aluno> alunos = new ArrayList<Aluno>();
@@ -10,8 +12,32 @@ public class Unidade {
 		alunos.add(aluno);
 	}
 	
-	public ArrayList<Professor> getProfessores() {
-		return professores;
+	public void setProfessor(Professor professor) {
+		professores.add(professor);
+	}
+
+	public boolean removerAluno(long number) {
+		boolean ok = false;
+		for (int i = 0; i < alunos.size(); i++) {
+			if (alunos.get(i).getCPF() == number || alunos.get(i).getRA() == number) {
+				JOptionPane.showMessageDialog(null,"O Aluno " + alunos.get(i).getNome() + " foi removido com sucesso!","Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+				alunos.remove(i);
+				ok = true;
+			}
+		}
+		return ok;
+	}
+	
+	public boolean removerProfessor(long number) {
+		boolean ok = false;
+		for (int i = 0; i < professores.size(); i++) {
+			if (professores.get(i).getCPF() == number || professores.get(i).getRA() == number) {
+				JOptionPane.showMessageDialog(null,"O Professor " + professores.get(i).getNome() + " foi removido com sucesso!","Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+				professores.remove(i);
+				ok = true;
+			}
+		}
+		return ok;
 	}
 	
 	public Professor getProfessor(long RA) {
@@ -24,10 +50,10 @@ public class Unidade {
 				
 	}
 	
-	public ArrayList<Aluno> getAlunos() {
-		return alunos;
+	public ArrayList<Professor> getProfessores() {
+		return professores;
 	}
-	
+
 	public Aluno getAluno(long RA) {
 		for (Aluno aluno: alunos) {
 			if (aluno.getRA() == RA)
@@ -37,10 +63,9 @@ public class Unidade {
 		return null;
 				
 	}
-	
-	public void setProfessor(Professor professor) {
-		professores.add(professor);
+
+	public ArrayList<Aluno> getAlunos() {
+		return alunos;
 	}
 
-	
 }

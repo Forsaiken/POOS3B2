@@ -3,13 +3,11 @@ package objects;
 public class Disciplina {
 
 	private byte codigo;
-	private String nome;
 	private float[] trabalhos;
 	private float[] provas;
 
-	public Disciplina(byte codigo, String nome) {
+	public Disciplina(byte codigo) {
 		
-		this.nome = nome;
 		this.codigo = codigo;
 		trabalhos = new float[2];
 		provas = new float[2];
@@ -81,10 +79,6 @@ public class Disciplina {
 
 	public byte getCodigo() {
 		return this.codigo;
-	}
-
-	public String getNome() {
-		return this.nome;
 	}
 
 }

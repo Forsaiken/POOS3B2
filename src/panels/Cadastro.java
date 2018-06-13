@@ -37,16 +37,28 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 	
 	private static FormUI ADDform;
 	String[] questions = new String[] {
-			"%ONE%%NEED%Escolha uma das opções abaixo:",
-			"Cadastro de Professor:",
-			"Cadastro de Aluno:",
-			"%MULTI%%NEED%Vincule as matérias:"};
+			"%ONE%%NEED%Escolha o painel que deseja acessar:",
+			"%ONE%%NEED%Escolha a opção que deseja:",
+			"%ONE%%NEED%Escolha a opção que deseja:",
+			"Preencha as lacunas para cadastrar o Aluno:",
+			"Preencha as lacunas para Cadastrar o Professor:",
+			"%ONE%Preencha uma das lacunas para remover o Aluno:",
+			"%ONE%Preencha uma das lacunas para remover o Professor:",
+			"%MULTI%%NEED%Vincule as matérias:",
+			"%ONE%Selecione a qual matéria deseja vincular a nota:",
+			"Preencha os campos para vincular a nota:"};
 	
 	String[][] options= new String[][] {
-		{"Adicionar Professor", "Adicionar Aluno"},
-		{"%BOX%%NEED%Nome do Professor","%BOX%%NEED%RA", "%BOX%CPF"},
-		{"%BOX%%NEED%Nome do Aluno","%BOX%%NEED%RA", "%BOX%CPF"},
-		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"}};
+		{"Painel de Alunos", "Painel de Professores"},
+		{"Adicionar Aluno","Remover Aluno", "Visualizar Aluno"},
+		{"Adicionar Professor", "Remover Professor","Vincular Nota Bimestral","Visualizar Professores"},
+		{"%BOX%%NEED%Nome do Aluno","%BOX%%NEED%RA", "%BOX%CPF (Opcional)"},
+		{"%BOX%%NEED%Nome do Professor","%BOX%%NEED%ID", "%BOX%CPF (Opcional)"},
+		{"%BOX%%NEED%RA do Aluno", "%BOX%%NEED%CPF do Aluno"},
+		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%CPF do Professor"},
+		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},		
+		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},
+		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%RA do Aluno", "%BOX%%NEED%Bimestre", "Nota de Trabalho", "Nota de Prova"}};
 	
 	
 	Sprite configSGBD, configSGBD2;
@@ -100,82 +112,60 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		ADDform.setValidator(1,Question1);
 		ADDform.setValidator(2,Question2);
 		ADDform.setValidator(3,Question3);
+		ADDform.setValidator(4,Question4);
+		ADDform.setValidator(5,Question5);
+		ADDform.setValidator(6,Question6);
+		ADDform.setValidator(7,Question7);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
+		
 	}
 	
 	public static Runnable Question0 = new Runnable() {
 		public void run() {
+			
 			String answer = ADDform.getAnswer(0);
-			if (answer.equals("Adicionar Aluno")) {
-				ADDform.next(2);
-			} else if (answer.equals("Adicionar Professor")) {
+			
+			if (answer.equals("Painel de Alunos"))
 				ADDform.next(1);
-			}
+			else if (answer.equals("Painel de Professores"))
+				ADDform.next(2);
 		}
+
 	};
 	
 	public static Runnable Question1 = new Runnable() {
 		public void run() {
-			String answer1 = ADDform.getAnswer(1, 0);
-			String answer2 = ADDform.getAnswer(1, 1);
-			String answer3 = ADDform.getAnswer(1, 2);
-			
-			boolean erro = false;
-			
-			if (answer1.matches(".*\\d+.*")) {
-				JOptionPane.showMessageDialog(null,"Nome não pode possuir número.","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			} else if (answer1.replaceAll("\\s+", "").length() < 3) {
-				JOptionPane.showMessageDialog(null,"Nome requer mais que 3 caracteres.","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			}
-			
-			if (!answer2.matches("[0-9]+")) {
-				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
-				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			}
-			
-			if (!answer3.matches("[0-9]+") && !answer3.equals("")) {
-				JOptionPane.showMessageDialog(null,"CPF somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			} else if (answer3.replaceAll("\\s+", "").length() != 11  && !answer3.equals("")) {
-				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
-				erro = true;
-			}
-			
-			if (erro != true) {
-				
-				long RA = Long.parseLong(answer2);
-				
-				Professor professor = new Professor(answer1, RA);
-				if (!answer3.equals("")) {
-					long CPF = Long.parseLong(answer3);
-					professor.setCPF(CPF);
-				}
-				
-				unidade.setProfessor(professor);
-				
-				System.out.println("O professor " + unidade.getProfessor(RA).getNome() + " foi adicionado com sucesso!");
-				
-				lastProfessor = professor;
+			String answer = ADDform.getAnswer(1);
+			if (answer.equals("Adicionar Aluno"))
 				ADDform.next(3);
-		
-			}
-			
-			
+			else if (answer.equals("Remover Aluno"))
+				ADDform.next(5);
+			else if (answer.equals("Visualizar Aluno e Notas"))
+				ADDform.next(0);			
 		}
 	};
 	
 	public static Runnable Question2 = new Runnable() {
 		public void run() {
-			String answer1 = ADDform.getAnswer(2, 0);
-			String answer2 = ADDform.getAnswer(2, 1);
-			String answer3 = ADDform.getAnswer(2, 2);
+			String answer = ADDform.getAnswer(2);
+			if (answer.equals("Adicionar Professor"))
+				ADDform.next(4);
+			else if (answer.equals("Remover Professor"))
+				ADDform.next(6);
+			else if (answer.equals("Vincular Nota Bimestral"))
+				ADDform.next(8);
+			else if (answer.equals("Visualizar Professores"))
+				ADDform.next(0);	
+		}
+	};
+	
+	public static Runnable Question3 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(3, 0);
+			String answer2 = ADDform.getAnswer(3, 1);
+			String answer3 = ADDform.getAnswer(3, 2);
 			
 			boolean erro = false;
 			
@@ -188,7 +178,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			}
 			
 			if (!answer2.matches("[0-9]+")) {
-				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,"RA deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
 				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
@@ -196,7 +186,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			}
 			
 			if (!answer3.matches("[0-9]+") && !answer3.equals("")) {
-				JOptionPane.showMessageDialog(null,"CPF somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,"CPF deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else if (answer3.replaceAll("\\s+", "").length() != 11  && !answer3.equals("")) {
 				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
@@ -219,17 +209,167 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				System.out.println("O aluno " + unidade.getAluno(RA).getNome() + " foi adicionado com sucesso!");
 				
 				lastAluno = aluno;
-				ADDform.next(3);
+				ADDform.next(7);
 		
 			}
 			
 		}
 	};
 	
-	public static Runnable Question3 = new Runnable() {
+	public static Runnable Question4 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(4, 0);
+			String answer2 = ADDform.getAnswer(4, 1);
+			String answer3 = ADDform.getAnswer(4, 2);
+			
+			boolean erro = false;
+			
+			if (answer1.matches(".*\\d+.*")) {
+				JOptionPane.showMessageDialog(null,"Nome não pode possuir número.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 3) {
+				JOptionPane.showMessageDialog(null,"Nome requer mais que 3 caracteres.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer3.matches("[0-9]+") && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer3.replaceAll("\\s+", "").length() != 11  && !answer3.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (erro != true) {
+				
+				long RA = Long.parseLong(answer2);
+				
+				Professor professor = new Professor(answer1, RA);
+				if (!answer3.equals("")) {
+					long CPF = Long.parseLong(answer3);
+					professor.setCPF(CPF);
+				}
+				
+				unidade.setProfessor(professor);
+				
+				System.out.println("O professor " + unidade.getProfessor(RA).getNome() + " foi adicionado com sucesso!");
+				
+				lastProfessor = professor;
+				ADDform.next(7);
+		
+			}
+			
+			
+		}
+	};
+	
+	public static Runnable Question5 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(5, 0);
+			String answer2 = ADDform.getAnswer(5, 1);
+			
+			boolean erro = false;
+			
+			if (!answer1.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+") && !answer2.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() != 11  && !answer2.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (erro != true) {
+				
+				boolean exclude = false;
+				
+				if (!answer1.equals("")) {
+					long RA = Long.parseLong(answer1);
+					exclude = unidade.removerAluno(RA);
+				}
+				
+				if (!exclude && !answer2.equals("")) {
+					long CPF = Long.parseLong(answer2);
+					exclude = unidade.removerAluno(CPF);
+				}
+				
+				if (!exclude) {
+					JOptionPane.showMessageDialog(null,"Aluno não encontrado!","Erro", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				ADDform.resetTextBox();
+		
+			}
+		}
+	};
+	
+	public static Runnable Question6 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(6, 0);
+			String answer2 = ADDform.getAnswer(6, 1);
+			
+			boolean erro = false;
+			
+			if (!answer1.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"RA somente deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"RA requer mais que 4 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (!answer2.matches("[0-9]+") && !answer2.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF deve conter somente números","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer2.replaceAll("\\s+", "").length() != 11  && !answer2.equals("")) {
+				JOptionPane.showMessageDialog(null,"CPF requer 11 números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+			
+			if (erro != true) {
+				
+				boolean exclude = false;
+				
+				if (!answer1.equals("")) {
+					long ID = Long.parseLong(answer1);
+					exclude = unidade.removerProfessor(ID);
+				}
+				
+				if (!exclude && !answer2.equals("")) {
+					long CPF = Long.parseLong(answer2);
+					exclude = unidade.removerProfessor(CPF);
+				}
+				
+				if (!exclude) {
+					JOptionPane.showMessageDialog(null,"Professor não encontrado!","Erro", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				ADDform.resetTextBox();
+		
+			}
+		}
+	};
+	
+	
+	public static Runnable Question7 = new Runnable() {
 		public void run() {
 			
-			String[] answer = ADDform.getAnswers(3);
+			String[] answer = ADDform.getAnswers(7);
 			
 			for (int i = 0; i < answer.length;i++) {
 				if (ADDform.getPreviousQuestion() == 1) {
@@ -248,18 +388,18 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				if (ADDform.getPreviousQuestion() == 2) {
 					switch (answer[i]) {
 					case "Economia":
-						lastAluno.setDisciplina(ECONOMIA,"Economia");
+						lastAluno.setDisciplina(ECONOMIA);
 					case "Engenharia de Software":
-						lastAluno.setDisciplina(ENGENHARIA_SOFTWARE,"Engenharia de Software");
+						lastAluno.setDisciplina(ENGENHARIA_SOFTWARE);
 					case "Programação Orientada a Objetos":
-						lastAluno.setDisciplina(POO1, "Programação Orientada a Objetos");
+						lastAluno.setDisciplina(POO1);
 					case "Sistemas de Computação":
-						lastAluno.setDisciplina(SISTEMAS_COMPUTACAO, "Sistemas de Computação");
+						lastAluno.setDisciplina(SISTEMAS_COMPUTACAO);
 					}
 				}
 			}
-				
-			System.out.println(lastProfessor.getNome() + " disciplinas vinculadas com sucesso.");
+			
+			ADDform.next(0);
 		}
 	};
 	

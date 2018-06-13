@@ -25,14 +25,6 @@ import global.Settings;
 
 public class FormUI implements KeyListener, MouseListener, MouseMotionListener, ActionListener {
 	
-	public interface qType {
-
-	}
-	
-	public interface oType {
-
-	}
-	
 	// FORM PROPERTIES
 	
 	private int posX;
@@ -42,9 +34,11 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 	
 	private boolean open;
 	private boolean next;
+	private boolean back;
 	private int needed;
 	
 	private JPanel panel;
+	ArrayList<Integer> passage = new ArrayList<Integer>();
 	
 	// QUESTION VARIABLES
 	
@@ -105,25 +99,76 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 	public void draw(Graphics g) {
 		
 		if (open) {
-			questions.get(0).setInitialLocation(0 - questions.get(0).getStringWidth(g)/2, questions.get(0).getPosY());
+			questions.get(0).setInitialLocation(Settings.WIDTH + questions.get(0).getStringWidth(g)/2, questions.get(0).getPosY());
 			questions.get(0).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(0).setAnimation(true);
 			open = false;
+			passage.add(0);
 		}
 		
 		if (next) {
+			questions.get(nextQuestion).setInitialLocation(Settings.WIDTH + questions.get(nextQuestion).getStringWidth(g), questions.get(nextQuestion).getPosY());
+			questions.get(nextQuestion).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
+			questions.get(nextQuestion).setAnimation(true);
+			
+			questions.get(question).reverseLocation();
+			questions.get(question).setFinalPosX(0 - questions.get(question).getStringWidth(g));
+			questions.get(question).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
+			questions.get(question).setAnimation(true);
+			
+			this.passage.add(nextQuestion);
+			this.previousQuestion = question;
+			this.question = nextQuestion;
+			next = false;
+			
+			if (question != 0) {
+				openBack();
+				resetOptions();
+				backEnabled = true;
+			} else {
+				
+				for (int i = 0; i < passage.size(); i++) {
+					if (i > 0) {
+						passage.remove(i);
+					}
+				}
+				
+				resetOptions();
+				closeBack();
+			}
+			
+			System.out.println("Questão " + question + " e questão anterior " + previousQuestion);
+			
+		}
+		
+		if (back) {
 			questions.get(nextQuestion).setInitialLocation(0 - questions.get(nextQuestion).getStringWidth(g), questions.get(nextQuestion).getPosY());
 			questions.get(nextQuestion).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(nextQuestion).setAnimation(true);
 			
 			questions.get(question).reverseLocation();
 			questions.get(question).setFinalPosX(Settings.WIDTH + questions.get(question).getStringWidth(g));
-			questions.get(question).setMotionAnimation(0.3f, 0, 0, 0, 0.1f);
+			questions.get(question).setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			questions.get(question).setAnimation(true);
 			
-			this.previousQuestion = question;
+			this.passage.remove(passage.size() - 1);
 			this.question = nextQuestion;
-			next = false;
+			back = false;
+			
+			if (passage.size() - 2 >= 0)
+				previousQuestion = passage.get(passage.size() - 2);
+			
+			if (question != 0) {
+				openBack();
+				openNext();
+				backEnabled = true;
+			} else {
+				openNext();
+				closeBack();
+			}
+			
+			System.out.println("Questão " + question + " e questão anterior " + previousQuestion);
+			
 		}
 		
 		backArrow.draw(g);
@@ -134,7 +179,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		
 		questions.get(this.question).draw(g);
 		
-		if (options.get(0).get(previousQuestion).getAnimation()) {
+		if (options.get(previousQuestion).get(0).getAnimation()) {
 			for (int i = 0; i < options.get(previousQuestion).size(); i++) {
 				options.get(previousQuestion).get(i).draw(g);
 			}
@@ -144,21 +189,11 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			options.get(question).get(i).draw(g);
 		}
 		
-		/**
-		
-		for (int i = 0; i < boxes.get(question).size(); i++) {
-			if (boxes.get(nextQuestion).get(i) != null) {
-				boxes.get(question).get(i).repaint();
-			}
-		}
-		
-		**/
-		
 	}
 	
 	public void open() {
 		for (Sprite i: options.get(0)) {
-			i.setInitialLocation(0 - i.getWidth(), i.getFinalY());
+			i.setInitialLocation(Settings.WIDTH + i.getWidth(), i.getFinalY());
 			i.setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			i.setAnimation(true);
 		}
@@ -180,7 +215,8 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 				i.getTextBox().setVisible(true);
 			}
 			
-			i.setInitialLocation(0 - i.getWidth(), i.getFinalY());
+			i.setInitialLocation(Settings.WIDTH + i.getWidth(), i.getFinalY());
+			i.setFinalPosX(this.posX);
 			i.setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			i.setAnimation(true);
 			
@@ -188,32 +224,22 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		
 		for (String string : this.optionStrings[nextQuestion]) {
 			if (string.contains("%NEED%")) {
-				needed++;
+				if (questionStrings[nextQuestion].contains("%ONE%"))
+					needed = 1;
+				else
+					needed++;
 				t.start();
 			}
 		}
 		
-		/**
-		
-		for (int i = 0; i < boxes.get(nextQuestion).size(); i++) {
-			if (boxes.get(nextQuestion).get(i) != null) {
-				panel.add(boxes.get(nextQuestion).get(i));
-				boxes.get(nextQuestion).get(i).setVisible(true);
-				System.out.println("teste");
-			}
-		}
-		
-		**/
-		
 		for (Sprite i: options.get(question)) {
 			
 			if (i.getTextBox() != null) {
-				i.remove(panel);
 				i.getTextBox().setVisible(false);
 			}
 			
 			i.setInitialLocation(i.getPosX(), i.getPosY());
-			i.setFinalLocation(Settings.window.getWidth() + i.getWidth(), i.getFinalY());
+			i.setFinalLocation(0 - i.getWidth(), i.getFinalY());
 			i.setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
 			i.setAnimation(true);
 		}
@@ -222,6 +248,48 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		
 	}
 	
+	public void back(int previousQuestion) {
+		
+		needed = 0;
+		t.stop();
+		
+		this.nextQuestion = previousQuestion;
+		for (Sprite i: options.get(previousQuestion)) {
+			if (i.getTextBox() != null) {
+				i.getTextBox().setVisible(true);
+			}
+			
+			i.setInitialLocation(0 - i.getWidth(), i.getFinalY());
+			i.setFinalPosX(this.posX);
+			i.setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
+			i.setAnimation(true);
+		}
+		
+		for (String string : this.optionStrings[previousQuestion]) {
+			if (string.contains("%NEED%")) {
+				if (questionStrings[previousQuestion].contains("%ONE%"))
+					needed = 1;
+				else
+					needed++;
+				t.start();
+			}
+		}
+		
+		for (Sprite i: options.get(question)) {
+			
+			if (i.getTextBox() != null) {
+				i.getTextBox().setVisible(false);
+			}
+			
+			i.setInitialLocation(i.getPosX(), i.getPosY());
+			i.setFinalLocation(Settings.WIDTH + i.getWidth(), i.getFinalY());
+			i.setMotionAnimation(0.5f, 0, 0, 0, 0.1f);
+			i.setAnimation(true);
+		}
+		
+		back = true;		
+		
+	}
 	public void setQuestions(String[] questions, byte textFormat, Font font, Color[] color, float alpha) {
 		
 		this.questionStrings = questions;
@@ -265,39 +333,6 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			
 			for (int y = 0; y < options[x].length; y++) {
 				
-				if(options[x][y].contains("%BOX%")) {
-					
-					Sprite option = new Sprite();
-					
-					/**
-					 
-					TextBox tf = new TextBox(this.removeTags(this.removeTags(options[x][y])));
-					tf.setFont(font);
-					tf.setBackground(Color.WHITE);
-					tf.setForeground(Color.BLACK);
-					tf.setBounds(this.posX + Settings.convertPositionX(20), this.posY + (this.optionDistance * 2) + y * (this.optionDistance + this.optionRectHeight), this.width - Settings.convertWidth(40), this.optionRectHeight );
-					tf.setVisible(false);
-					tf.setOpaque(false);
-					tf.setBorder(null);
-					tf.addMouseListener(new MouseAdapter() {
-						public void mouseClicked(MouseEvent e) {
-							if (tf.getText() == FormUI.this.removeTags(FormUI.this.removeTags(optionsStrings))){
-								
-							}
-						}
-					});
-					
-					tf.addKeyListener(new KeyAdapter() {
-						public void keyTyped(KeyEvent e) {
-							
-						}
-					});
-					
-					this.boxes.get(x).add(tf);
-					
-					**/
-					
-				}
 					Sprite option = new Sprite();
 					option.setFillRect(this.width, this.optionRectHeight, this.optionRectColor);
 					option.setStroke(this.optionRectStroke, this.optionRectStrokeColor);
@@ -342,7 +377,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			}
 		}
 		
-		backArrow.setFillPolygon(new int[] {60,0,60,45}, new int[] {30,0,-30,0}, optionRectColor, 1f);
+		backArrow.setFillPolygon(new int[] {60,0,60,45}, new int[] {0,30,60,30}, optionRectColor, 1f);
 		backArrow.setStroke(new int[] {Settings.convertWidth(2),Settings.convertWidth(2),Settings.convertWidth(2)}, optionRectStrokeColor);
 		backArrow.setInitialAlpha(0f);
 		backArrow.setAlphaToInitial();
@@ -366,11 +401,21 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 	public void resetOptions() {
 		for (int i = 0; i < options.get(question).size();i++) {
 			options.get(question).get(i).setMode(0);
+			if (questionStrings[question].contains("%MULTI%"))	
+					answers.get(question).set(i, "null");
 		}
-		answers.get(question).set(question, "null");
+		
+		if (questionStrings[question].contains("%ONE%"))
+			answers.get(question).set(0, "null");
 	}
 	
-	public void setVisible() {
+	public void resetTextBox() {
+		for (int i = 0; i < options.get(question).size();i++) {
+			if (options.get(question).get(i).getTextBox() != null) {
+				options.get(question).get(i).getTextBox().setText("");
+				options.get(question).get(i).setSample();
+			}
+		}
 	}
 	
 	public void openNext() {
@@ -406,6 +451,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		nextArrow.setAlphaToInitial();
 		nextArrow.setMotionAnimation(0, 0, 0, 0, 0.5f);
 		nextArrow.setAnimation(true);
+		nextArrow.setMode(0);
 		
 		this.nextEnabled = false;
 		
@@ -416,7 +462,10 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		int firstOpt = this.options.get(question).get(0).getPosY();
 		int lastOpt = this.options.get(question).get(options.get(question).size() - 1).getPosY() + this.options.get(question).get(options.get(question).size() - 1).getHeight();
 		
-		backArrow.setLocation(this.posX - Settings.convertPositionX(200), firstOpt + (lastOpt - firstOpt) / 2 - backArrow.getWidth()/2);
+		if(backArrow.getAnimation())
+			backArrow.resetCountAnimation();
+		
+		backArrow.setLocation(this.posX - Settings.convertPositionX(200) - backArrow.getWidth(), firstOpt + (lastOpt - firstOpt) / 2 - backArrow.getWidth()/2);
 		backArrow.setFinalAlpha(1f);
 		backArrow.setInitialAlpha(0f);
 		backArrow.setAlphaToInitial();
@@ -424,6 +473,26 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		backArrow.setAnimation(true);
 		
 		this.backEnabled = true;
+			
+	}
+
+	public void closeBack() {
+		
+		int firstOpt = this.options.get(question).get(0).getPosY();
+		int lastOpt = this.options.get(question).get(options.get(question).size() - 1).getPosY() + this.options.get(question).get(options.get(question).size() - 1).getHeight();
+		
+		if(backArrow.getAnimation())
+			backArrow.resetCountAnimation();
+		
+		backArrow.setLocation(this.posX - Settings.convertPositionX(200) - backArrow.getWidth(), firstOpt + (lastOpt - firstOpt) / 2 - backArrow.getWidth()/2);
+		backArrow.setFinalAlpha(0f);
+		backArrow.setInitialAlpha(1f);
+		backArrow.setAlphaToInitial();
+		backArrow.setMotionAnimation(0, 0, 0, 0, 0.5f);
+		backArrow.setAnimation(true);
+		backArrow.setMode(0);
+		
+		this.backEnabled = false;
 			
 	}
 	
@@ -572,6 +641,13 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 			}
 		}
 		
+		if (backEnabled) {
+			if (e.getX() > backArrow.getPosX() && e.getY() > backArrow.getPosY() + Settings.TWH && e.getX() < backArrow.getWidth() + backArrow.getPosX() && e.getY() < backArrow.getHeight() + backArrow.getPosY() + Settings.TWH) {
+				closeBack();
+				this.back(previousQuestion);
+			}
+		}
+		
 	}
 
 	@Override
@@ -596,6 +672,14 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 				nextArrow.setMode(0);
 			}
 		}
+		
+		if (backEnabled) {
+			if (e.getX() > backArrow.getPosX() && e.getY() > backArrow.getPosY() + Settings.TWH && e.getX() < backArrow.getWidth() + backArrow.getPosX() && e.getY() < backArrow.getHeight() + backArrow.getPosY() + Settings.TWH) {
+				backArrow.setMode(2);
+			} else {
+				backArrow.setMode(0);
+			}
+		}
 			
 		
 	}
@@ -617,7 +701,6 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 		// TODO Auto-generated method stub
 		
 	}
-
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -634,7 +717,7 @@ public class FormUI implements KeyListener, MouseListener, MouseMotionListener, 
 				}
 			}
 		
-			if (count == needed) {
+			if (count >= needed) {
 				if (!nextEnabled)
 					this.openNext();
 			} else {

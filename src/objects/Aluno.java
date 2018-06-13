@@ -5,7 +5,7 @@ import global.Materias;
 
 public class Aluno extends Pessoa implements Materias {
 
-	private ArrayList<Disciplina> Disciplinas;
+	private ArrayList<Disciplina> disciplinas;
 	
 	public Aluno(String nome, long RA) {
 		
@@ -13,27 +13,36 @@ public class Aluno extends Pessoa implements Materias {
 		this.setRA(RA);
 		this.setUnidade(unidade);
 		
-		Disciplinas = new ArrayList<Disciplina>();
+		disciplinas = new ArrayList<Disciplina>();
 		
 	}
 	
-	public void setDisciplina(byte codigo, String nome) {
+	public void setDisciplina(byte codigo) {
 		
-		Disciplina disciplina = new Disciplina(codigo, nome);
-		Disciplinas.add(disciplina);
+		Disciplina disciplina = new Disciplina(codigo);
+		
+		boolean exists = false;
+		
+		for (Disciplina i: disciplinas) {
+			if (i.getCodigo() == codigo) {
+				exists = true;
+			}
+		}
+		
+		disciplinas.add(disciplina);
 		
 	}
 	
 
 	public Disciplina getDisciplina(byte codigo) {
 		int index = 666;
-		for (int i = 0; i < Disciplinas.size(); i++) {
-			if (Disciplinas.get(i).getCodigo() == codigo) {
+		for (int i = 0; i < disciplinas.size(); i++) {
+			if (disciplinas.get(i).getCodigo() == codigo) {
 				index = i;
 				break;
 			}
 		}
-		return Disciplinas.get(index);
+		return disciplinas.get(index);
 	}
 	
 }
