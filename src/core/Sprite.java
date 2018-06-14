@@ -215,7 +215,7 @@ public class Sprite implements Constants, Cloneable, MouseListener, MouseMotionL
 				
 		if (string != null){
 					
-			g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			
 			if (spacedFont == true) {
 				Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();

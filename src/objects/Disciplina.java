@@ -1,16 +1,29 @@
 package objects;
 
+import global.Materias;
+
 public class Disciplina {
 
 	private byte codigo;
 	private double[] trabalhos;
 	private double[] provas;
+	private String nome;
 
 	public Disciplina(byte codigo) {
 		
 		this.codigo = codigo;
+		
 		trabalhos = new double[2];
 		provas = new double[2];
+		
+		if (codigo == Materias.ECONOMIA)
+			this.nome = "Economia";
+		else if (codigo == Materias.ENGENHARIA_SOFTWARE)
+			this.nome = "Engenharia de Software";
+		else if (codigo == Materias.POO1)
+			this.nome = "Programação Orientada a Objetos";
+		else if (codigo == Materias.SISTEMAS_COMPUTACAO)
+			this.nome = "Sistemas de Computação";
 
 	}
 
@@ -37,48 +50,40 @@ public class Disciplina {
 		}
 
 	}
-
-	public double getNotaB1() {
-
-		double notaB1 = 0;
-
-		for (int i = 0; i < 1; i++) {
-			notaB1 += (this.trabalhos[i] + this.provas[i]);
-		}
-
-		return notaB1;
+	
+	public double getNotaProva(int bimestre) {
+		return this.provas[bimestre - 1];
+		
 	}
-
-	public double getNotaB2() {
-
-		double notaB2 = 0;
-
-		for (int i = 1; i < 2; i++) {
-			notaB2 += (this.trabalhos[i] + this.provas[i]);
+	
+	public double getNotaTrabalho(int bimestre) {
+		return this.trabalhos[bimestre - 1];
+		
+	}
+	
+	public double getNotaBimestral(int bimestre) {
+		if (bimestre == 1) {
+			return (provas[0] + trabalhos[0]);
+		} else if (bimestre == 2) {
+			return (provas[1] + trabalhos[1]);
+		} else {
+			System.out.println("Valor bimestral deve ser 1 ou 2");
 		}
-
-		return notaB2;
+		
+		return 0;
 	}
 
 	public double getNotaTotal() {
 
-		double notaB1 = 0;
-
-		for (int i = 0; i < 1; i++) {
-			notaB1 += (this.trabalhos[i] + this.provas[i]) * 0.4f;
-		}
-
-		double notaB2 = 0;
-
-		for (int i = 1; i < 2; i++) {
-			notaB2 += (this.trabalhos[i] + this.provas[i]) * 0.6f;
-		}
-
-		return notaB1 + notaB2;
+		return (provas[0] + trabalhos[0]) * 0.4 + (provas[0] + trabalhos[0]) * 0.6;
 	}
 
 	public byte getCodigo() {
 		return this.codigo;
+	}
+	
+	public String getNome() {
+		return this.nome;
 	}
 
 }

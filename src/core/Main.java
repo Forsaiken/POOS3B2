@@ -11,7 +11,9 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.swing.SwingUtilities;
 
+import global.Materias;
 import global.Settings;
+import objects.Aluno;
 import objects.Unidade;
 import panels.Cadastro;
 
@@ -122,7 +124,18 @@ public class Main {
 	
 	private static Runnable Cadastro = new Runnable() {
 		public void run() {
-			anhanguera = new Unidade();
+			anhanguera = new Unidade("São Paulo (Campus Marte)");
+			Aluno vitor = new Aluno("Vitor Gomes Martins Mendes",8799001598L,anhanguera);
+			anhanguera.setAluno(vitor);
+			vitor.setDisciplina(Materias.POO1);
+			vitor.setDisciplina(Materias.SISTEMAS_COMPUTACAO);
+			vitor.setDisciplina(Materias.ECONOMIA);
+			vitor.setDisciplina(Materias.ENGENHARIA_SOFTWARE);
+			vitor.getDisciplina(0).setNotaTrabalho(1, 2);
+			vitor.getDisciplina(0).setNotaTrabalho(2, 3);
+			vitor.getDisciplina(0).setNotaProva(1, 5);
+			vitor.getDisciplina(0).setNotaProva(2, 6);
+			
 			cadastro = new Cadastro(stopSignal, anhanguera);
 			cadastro.setVisible(true);
 			Settings.window.getContentPane().add(cadastro);

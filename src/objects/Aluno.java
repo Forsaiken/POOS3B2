@@ -5,15 +5,13 @@ import global.Materias;
 
 public class Aluno extends Pessoa implements Materias {
 
-	private ArrayList<Disciplina> disciplinas;
+	private ArrayList<Disciplina> disciplinas = new ArrayList<Disciplina>();
 	
-	public Aluno(String nome, long RA) {
+	public Aluno(String nome, long RA, Unidade unidade) {
 		
 		this.setNome(nome);
 		this.setRA(RA);
 		this.setUnidade(unidade);
-		
-		disciplinas = new ArrayList<Disciplina>();
 		
 	}
 	
@@ -31,7 +29,7 @@ public class Aluno extends Pessoa implements Materias {
 		
 		if (exists != true) {
 			disciplinas.add(disciplina);
-			System.out.println(disciplina.getCodigo() + "foi adicionada. Total: " + disciplinas.size());
+			System.out.println(this.Nome + " " + disciplina.getCodigo() + " foi adicionada. Total: " + disciplinas.size());
 		}
 		
 	}
@@ -45,6 +43,19 @@ public class Aluno extends Pessoa implements Materias {
 			}
 		}
 		return null;
+	}
+	
+
+	public Disciplina getDisciplina(int array) {
+		return this.disciplinas.get(array);
+	}
+	
+	public ArrayList<Disciplina> getDisciplinas() {
+		return this.disciplinas;
+	}
+	
+	public Unidade getUnidade() {
+		return this.unidade;
 	}
 	
 }

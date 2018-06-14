@@ -1,16 +1,20 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import core.FormUI;
@@ -28,10 +32,12 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 	CountDownLatch CDL;
 	Timer t;
 	Sprite rect;
+	private static JFrame info;
 	private static Unidade unidade;
 	private static Professor lastProfessor;
 	private static Aluno lastAluno;
 	private static byte lastDisciplina;
+	private static AlunoInfo alunoInfo;
 	int phase;
 	
 	// Formulario
@@ -47,24 +53,28 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			"%ONE%Preencha uma das lacunas para remover o Professor:",
 			"%MULTI%%NEED%Vincule as matérias:",
 			"%ONE%Escolha a matéria que deseja vincular nota:",
-			"Preencha os campos para vincular a nota:"};
+			"Preencha os campos para vincular a nota:",
+			"Preencha a lacuna abaixo:"};
 	
 	String[][] options= new String[][] {
 		{"Painel de Alunos", "Painel de Professores"},
-		{"Adicionar Aluno","Remover Aluno", "Visualizar Aluno"},
-		{"Adicionar Professor", "Remover Professor","Vincular Nota Bimestral","Visualizar Professores"},
+		{"Adicionar Aluno","Remover Aluno", "Visualizar Aluno e Notas"},
+		{"Adicionar Professor", "Remover Professor","Vincular Nota Bimestral"},
 		{"%BOX%%NEED%Nome do Aluno","%BOX%%NEED%RA", "%BOX%CPF (Opcional)"},
 		{"%BOX%%NEED%Nome do Professor","%BOX%%NEED%ID", "%BOX%CPF (Opcional)"},
 		{"%BOX%%NEED%RA do Aluno", "%BOX%%NEED%CPF do Aluno"},
 		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%CPF do Professor"},
 		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},		
 		{"Economia","Engenharia de Software","Programação Orientada a Objetos","Sistemas de Computação"},
-		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%RA do Aluno", "%BOX%%NEED%Bimestre", "%BOX%%NEED%Nota de Trabalho", "%BOX%%NEED%Nota de Prova"}};
+		{"%BOX%%NEED%ID do Professor", "%BOX%%NEED%RA do Aluno", "%BOX%%NEED%Bimestre", "%BOX%%NEED%Nota de Trabalho", "%BOX%%NEED%Nota de Prova"},
+		{"%BOX%%NEED%RA ou CPF do Aluno"}};
 	
 	
 	Sprite configSGBD, configSGBD2;
 	
 	public Cadastro(CountDownLatch CDL, Unidade unidade) {
+		
+		this.alunoInfo = new AlunoInfo(null);
 		
 		this.setLayout(null);
 		this.setSize(Settings.widthResolution, Settings.heightResolution);
@@ -119,6 +129,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		ADDform.setValidator(7,Question7);
 		ADDform.setValidator(8,Question8);
 		ADDform.setValidator(9,Question9);
+		ADDform.setValidator(10,Question10);
 		
 		t = new Timer((int)Settings.FPS1000,this);
 		t.start();
@@ -146,7 +157,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			else if (answer.equals("Remover Aluno"))
 				ADDform.next(5);
 			else if (answer.equals("Visualizar Aluno e Notas"))
-				ADDform.next(0);			
+				ADDform.next(10);			
 		}
 	};
 	
@@ -160,7 +171,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 			else if (answer.equals("Vincular Nota Bimestral"))
 				ADDform.next(8);
 			else if (answer.equals("Visualizar Professores"))
-				ADDform.next(0);	
+				ADDform.next(0);
 		}
 	};
 	
@@ -200,7 +211,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				
 				long RA = Long.parseLong(answer2);
 				
-				Aluno aluno = new Aluno(answer1, RA);
+				Aluno aluno = new Aluno(answer1, RA, unidade);
 				if (!answer3.equals("")) {
 					long CPF = Long.parseLong(answer3);
 					aluno.setCPF(CPF);
@@ -453,7 +464,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				erro = true;
 			}
 			
-			if (!answer3.matches("[0-9]+") && answer3.length() != 1) {
+			if (!answer3.matches("[0-9]+") || answer3.length() != 1) {
 				JOptionPane.showMessageDialog(null,"Bimestre deve conter somente o número 1 ou 2.","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else {
@@ -463,7 +474,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				}
 			}
 			
-			if (!answer4.matches("[0-9]+") && answer4.length() != 1) {
+			if (!answer4.matches("[0-9]+") || answer4.length() != 1) {
 				JOptionPane.showMessageDialog(null,"Nota de Trabalho somente deve conter valor entre 0 e 3","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else {
@@ -473,7 +484,7 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 				}
 			}
 			
-			if (!answer5.matches("[0-9]+") && answer5.length() != 1) {
+			if (!answer5.matches("[0-9]+") || answer5.length() != 1) {
 				JOptionPane.showMessageDialog(null,"Nota de Prova somente deve conter valor entre 0 e 7","Erro", JOptionPane.ERROR_MESSAGE);
 				erro = true;
 			} else {
@@ -515,6 +526,69 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		}
 	};
 	
+	public static Runnable Question10 = new Runnable() {
+		public void run() {
+			String answer1 = ADDform.getAnswer(10);
+			
+			boolean erro = false;
+			
+			if (!answer1.matches("[0-9]+")) {
+				JOptionPane.showMessageDialog(null,"Esse campo deve conter apenas números.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			} else if (answer1.replaceAll("\\s+", "").length() < 4) {
+				JOptionPane.showMessageDialog(null,"Informe um valor com 4 digitos ou mais.","Erro", JOptionPane.ERROR_MESSAGE);
+				erro = true;
+			}
+
+			
+			if (erro != true) {
+								
+				Aluno aluno;
+				
+				if (!answer1.equals("")) {
+					long number = Long.parseLong(answer1);
+					aluno = unidade.getAluno(number);
+					
+					if (aluno != null) {
+						
+						System.out.println("Aluno encontrado! Abrindo Info...");
+						
+						 SwingUtilities.invokeLater(new Runnable() {
+					        public void run() {
+					        
+							alunoInfo.setAluno(aluno);
+							alunoInfo.setLocationDraw(Settings.convertPositionX(50), Settings.convertPositionY(50));
+							alunoInfo.load();
+							alunoInfo.setVisible(true);
+							
+							Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+							
+							if (info != null) {
+								info.remove(alunoInfo);
+								info.dispose();
+							}
+							
+							JFrame info = new JFrame();
+							info.setTitle(aluno.getNome());
+							info.setLocationRelativeTo(null);
+							info.setResizable(false);
+							info.setSize(Settings.convertWidth(1370), Settings.convertHeight(700));
+							info.setLocation(dim.width/2-info.getSize().width/2, dim.height/2-info.getSize().height/2);
+							info.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+							info.add(alunoInfo);
+							info.setVisible(true);
+							
+					            }
+						 } );
+						 
+					}
+					
+				}
+		
+			}
+		}
+	};
+	
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
@@ -522,6 +596,12 @@ public class Cadastro extends JPanel implements ActionListener, KeyListener, Con
 		configSGBD.draw(g);
 		configSGBD2.draw(g);
 		ADDform.draw(g);
+		/**
+		if (alunoInfo.isVisible()) {
+			alunoInfo.draw(g);
+		}
+		
+		**/
 	}
 
 	@Override

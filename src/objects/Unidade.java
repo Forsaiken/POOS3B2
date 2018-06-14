@@ -7,6 +7,11 @@ public class Unidade {
 	
 	private ArrayList<Aluno> alunos = new ArrayList<Aluno>();
 	private ArrayList<Professor> professores = new ArrayList<Professor>();
+	private String name;
+	
+	public Unidade(String name) {
+		this.name = name;
+	}
 	
 	public void setAluno(Aluno aluno) {
 		alunos.add(aluno);
@@ -54,9 +59,9 @@ public class Unidade {
 		return professores;
 	}
 
-	public Aluno getAluno(long RA) {
+	public Aluno getAluno(long number) {
 		for (Aluno aluno: alunos) {
-			if (aluno.getRA() == RA)
+			if (aluno.getRA() == number || aluno.getCPF() == number)
 				return aluno;
 		}
 		
@@ -66,6 +71,10 @@ public class Unidade {
 
 	public ArrayList<Aluno> getAlunos() {
 		return alunos;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 
 }
